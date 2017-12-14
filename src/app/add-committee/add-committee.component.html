@@ -1,0 +1,63 @@
+
+<div class="row">
+  <div class="col-lg-7" id="committees">
+    <div class="form-group" [formGroup]="committeeForm">
+      <h3> Committee information </h3>
+      <div class="col-lg-6">
+      <label> What is the name of the committee</label>
+      <input id="name" name="name" type="text" class="form-control input-lg" required />
+      <label> Describe this committee </label><br />
+      <textarea id="description" name="description" type="textarea" rows="8" class="form-control"></textarea>
+      <label> Enter the Session Name for grouping purposes <br /> (eg. "Ming Dynasty" or "34th Session of Parliament")</label><br />
+      <input id="session" name="session" type="text" class="form-control input-sm" /><br />
+      <label> When did it start? </label><br />
+      <input id="date" name="date" type="date" class="form-control input-sm" /><br />
+    </div>
+    </div>
+    <div class="col-lg-6">
+    <div class="form-group">
+
+      <label> Give the committee an abbreviated name<br /> (so it looks good on a graph)</label>
+      <input id="abbreviation" name="abbreviation" type="text" class="form-control input-sm" required /><br /><br />
+      <label> What country can I find this committee? </label><br />
+      <select id="country" name="country" class="form-control input-sm">
+        <option value="au">au / Australia</option>
+        <option value="ca">ca / Canada</option>
+        <option value="cn">cn / 中国</option>
+        <option value="fr">fr / France</option>
+        <option value="gr">gr / Ελληνικά</option>
+        <option value="il">il / ישראל</option>
+        <option value="ir">ir / ایران</option>
+        <option value="ru">ru / Россия </option>
+        <option value="nz">nz / New Zealand</option>
+        <option value="uk">uk / United Kingdom</option>
+        <option value="us">us / United States</option>
+      </select><br />
+      <label> Is there a more specific jurisdiction for this committee?<br />  (Region, State/Province, City etc. )</label><br />
+      <input id="jurisdiction" name="jurisdiction"  class="form-control input-sm" /><br />
+    </div>
+
+    <label> Any other notes you want to provide? </label>
+    <textarea id="notes" name="notes" class="form-control" rows="10"> </textarea>
+    </div>
+</div>
+  <div class="col-lg-5">
+    <h3> Members </h3>
+    <ul id="members" *ngFor="let member of members" class="list-group">
+    <li class="list-group-item">{{member.displayName}}</ul>
+    <p> You can add members to your items here: </p>
+    <div class="form-group" [formGroup]="memberForm">
+    <label>First Name (required):</label>
+    <input #first id="MemberFirst" formControlName="firstName" type="text" class="form-control" required />
+    <label>Last Name (required):</label>
+    <input #last id="MemberLast" formControlName="lastName" type="text" class="form-control" required />
+    <label>Middle Name (name or initial required):</label>
+    <input #middle id="MemberMiddle" formControlName="middleName" type="text" class="form-control" />
+    <label>What Affiliation Do they Have (eg political party)?</label>
+    <input #party id="MemberPary" formControlName="party" type="text" class="form-control" />
+    <label>When did they join? </label>
+    <input #date id="MemberDate" formControlName="date" type="date" class="form-control" />
+    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value)">Add Another Member &gt;</button>
+  </div>
+  </div>
+</div>
