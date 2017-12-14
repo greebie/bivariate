@@ -18,6 +18,7 @@ export class AddCommitteeComponent implements OnInit {
   committeesRef: AngularFireList<Committee>
   members: Member[] = [];
   memberForm: FormGroup;
+  committeeForm: FormGroup;
 
   constructor(public afAuth: AngularFireAuth, public db: AngularFireDatabase) {
     this.committeesRef = db.list<Committee>('/committees')
@@ -29,6 +30,15 @@ export class AddCommitteeComponent implements OnInit {
       middleName: new FormControl(),
       party: new FormControl(),
       date: new FormControl()
+    })
+    this.committeeForm = new FormGroup({
+      date: new FormControl(),
+      partyInPower: new FormControl(),
+      name: new FormControl(),
+      abbreviation: new FormControl(),
+      country: new FormControl(),
+      description: new FormControl(),
+      notes: new FormControl()
     })
   }
 
