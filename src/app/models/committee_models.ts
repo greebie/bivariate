@@ -4,6 +4,7 @@ export interface MemberInterface {
   middleName?: string,
   party?: string,
   elected?: Date,
+  finished?: Date,
   cabinet?: string,
   riding?: string
 }
@@ -11,6 +12,7 @@ export interface MemberInterface {
 export interface CommitteeInterface {
     session: string,
     date: Date,
+    enddate: Date,
     partyInPower?: string,
     name: string,
     abbreviation: string,
@@ -27,6 +29,7 @@ export class Member implements MemberInterface {
     middleName: string;
     party: string;
     elected: Date;
+    finished: Date;
     cabinet: string;
     riding: string;
     displayName: string;
@@ -36,6 +39,7 @@ export class Member implements MemberInterface {
       middleName?: string,
       party?: string,
       elected?: Date,
+      finished?: Date,
       cabinet?: string,
       riding?: string,
     ) {
@@ -44,6 +48,7 @@ export class Member implements MemberInterface {
       this.middleName = middleName;
       this.party = party;
       this.elected = elected;
+      this.finished = finished;
       this.cabinet = cabinet;
       this.riding = riding;
       this.displayName = lastName + ", " + firstName[0] + middleName[0]
@@ -53,6 +58,7 @@ export class Member implements MemberInterface {
 export class Committee implements CommitteeInterface {
   session: string;
   date:Date;
+  enddate: Date;
   partyInPower: string;
   name: string;
   abbreviation: string;
@@ -65,6 +71,7 @@ export class Committee implements CommitteeInterface {
   constructor (
     session: string,
     date: Date,
+    enddate: Date,
     partyInPower: string,
     name: string,
     abbreviation: string,
@@ -77,6 +84,7 @@ export class Committee implements CommitteeInterface {
   ) {
     this.session = session;
     this.date = date;
+    this.enddate = enddate;
     this.partyInPower = partyInPower;
     this.name = name;
     this.abbreviation = abbreviation;

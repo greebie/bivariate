@@ -29,7 +29,8 @@ export class AddCommitteeComponent implements OnInit {
       lastName: new FormControl(),
       middleName: new FormControl(),
       party: new FormControl(),
-      date: new FormControl()
+      date: new FormControl(),
+      enddate: new FormControl(),
     })
     this.committeeForm = new FormGroup({
       date: new FormControl(),

@@ -12,6 +12,8 @@
       <input id="session" formControlName="session" type="text" class="form-control input-sm" /><br />
       <label> When did it start? </label><br />
       <input id="date" formControlName="date" type="date" class="form-control input-sm" /><br />
+      <label> When did it end? (empty for present)</label><br />
+      <input id="date" formControlName="enddate" type="date" class="form-control input-sm" /><br />
     </div>
     </div>
     <div class="col-lg-6">
@@ -43,8 +45,6 @@
 </div>
   <div class="col-lg-5">
     <h3> Members </h3>
-    <ul id="members" *ngFor="let member of members" class="list-group">
-    <li class="list-group-item">{{member.displayName}}</ul>
     <p> You can add members to your committee here. Entries here will be used to map committees against each other. </p>
     <div class="form-group" [formGroup]="memberForm">
     <label>First Name (required):</label>
@@ -57,7 +57,12 @@
     <input #party id="MemberPary" formControlName="party" type="text" class="form-control" />
     <label>When did they join? </label>
     <input #date id="MemberDate" formControlName="date" type="date" class="form-control" />
-    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value)">Add Another Member &gt;</button>
+    <label>When did they finish? </label>
+    <input #enddate id="MemberEnddate" formControlName="enddate" type="date" class="form-control" />    
+    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value, enddate.value)">Add Another Member &gt;</button>
+
   </div>
+  <ul id="members" *ngFor="let member of members" class="list-group">
+  <li class="list-group-item">{{member.displayName}}</ul>
   </div>
 </div>
