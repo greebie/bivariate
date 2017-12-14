@@ -17,7 +17,6 @@
     </div>
     </div>
     <div class="col-lg-6">
-    <div class="form-group">
 
       <label> Give the committee an abbreviated name<br /> (so it looks good on a graph)</label>
       <input id="abbreviation" formControlName="abbreviation" type="text" class="form-control input-sm" required /><br /><br />
@@ -37,32 +36,47 @@
       </select><br />
       <label> Is there a more specific jurisdiction for this committee?<br />  (Region, State/Province, City etc. )</label><br />
       <input id="jurisdiction" formControlName="jurisdiction"  class="form-control input-sm" /><br />
-    </div>
 
     <label> Any other notes you want to provide? </label>
     <textarea id="notes" formControlName="notes" class="form-control" rows="10"> </textarea>
     </div>
 </div>
-  <div class="col-lg-5">
+  <div class="col-lg-4">
     <h3> Members </h3>
     <p> You can add members to your committee here. Entries here will be used to map committees against each other. </p>
     <div class="form-group" [formGroup]="memberForm">
+      <div class="col-lg-4">
     <label>First Name (required):</label>
-    <input #first id="MemberFirst" formControlName="firstName" type="text" class="form-control" required />
+    <input #first id="MemberFirst" formControlName="firstName" type="text" class="form-control input-sm" required />
+  </div>
+  <div class="col-lg-4">
     <label>Last Name (required):</label>
-    <input #last id="MemberLast" formControlName="lastName" type="text" class="form-control" required />
-    <label>Middle Name (name or initial required):</label>
-    <input #middle id="MemberMiddle" formControlName="middleName" type="text" class="form-control" />
-    <label>What Affiliation Do they Have (eg political party)?</label>
-    <input #party id="MemberPary" formControlName="party" type="text" class="form-control" />
+    <input #last id="MemberLast" formControlName="lastName" type="text" class="form-control input-sm" required />
+</div>
+<div class="col-lg-4">
+    <label>Middle Name (init required):</label>
+    <input #middle id="MemberMiddle" formControlName="middleName" type="text" class="form-control input-sm" />
+</div>
+<div class="col-lg-6">
+    <label>What Affiliation (eg political party)?</label>
+    <input #party id="MemberParty" formControlName="party" type="text" class="form-control input-sm" />
+</div>
+<div class="col-lg-6">
+    <label>What Profession (eg Doctor, Artist etc.)?</label>
+    <input #profession id="MemberProfession" formControlName="profession" type="text" class="form-control input-sm" />
+</div>
+<div class="col-lg-6">
     <label>When did they join? </label>
-    <input #date id="MemberDate" formControlName="date" type="date" class="form-control" />
+    <input #date id="MemberDate" formControlName="date" type="date" class="form-control input-sm" />
+</div>
+<div class="col-lg-6">
     <label>When did they finish? </label>
-    <input #enddate id="MemberEnddate" formControlName="enddate" type="date" class="form-control" />    
-    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value, enddate.value)">Add Another Member &gt;</button>
+    <input #enddate id="MemberEnddate" formControlName="enddate" type="date" class="form-control input-sm" />
+</div>
+    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value, enddate.value, profession.value)">Add Another Member &gt;</button>
 
   </div>
   <ul id="members" *ngFor="let member of members" class="list-group">
-  <li class="list-group-item">{{member.displayName}}</ul>
+  <li class="list-group-item">{{member.displayName}} ({{member.elected}} - {{member.finished}})</ul>
   </div>
 </div>

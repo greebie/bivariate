@@ -5,7 +5,7 @@ export interface MemberInterface {
   party?: string,
   elected?: Date,
   finished?: Date,
-  cabinet?: string,
+  profession?: string,
   riding?: string
 }
 
@@ -30,7 +30,7 @@ export class Member implements MemberInterface {
     party: string;
     elected: Date;
     finished: Date;
-    cabinet: string;
+    profession: string;
     riding: string;
     displayName: string;
     constructor (
@@ -40,7 +40,7 @@ export class Member implements MemberInterface {
       party?: string,
       elected?: Date,
       finished?: Date,
-      cabinet?: string,
+      profession?: string,
       riding?: string,
     ) {
       this.firstName = firstName;
@@ -49,7 +49,7 @@ export class Member implements MemberInterface {
       this.party = party;
       this.elected = elected;
       this.finished = finished;
-      this.cabinet = cabinet;
+      this.profession = profession;
       this.riding = riding;
       this.displayName = lastName + ", " + firstName[0] + middleName[0]
     }

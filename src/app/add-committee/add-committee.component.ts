@@ -31,9 +31,12 @@ export class AddCommitteeComponent implements OnInit {
       party: new FormControl(),
       date: new FormControl(),
       enddate: new FormControl(),
+      profession: new FormControl()
     })
     this.committeeForm = new FormGroup({
+      session: new FormControl(),
       date: new FormControl(),
+      enddate: new FormControl(),
       partyInPower: new FormControl(),
       name: new FormControl(),
       abbreviation: new FormControl(),
@@ -58,8 +61,11 @@ export class AddCommitteeComponent implements OnInit {
     this.committeesRef.push(desc);
   }
 
-  addMemberForm(first, last, middle?, party?, date?) {
-    this.members.push(new Member(first, last, middle, party, date));
+  addMemberForm(first,
+    last, middle?, party?, date?,
+    enddate?, profession? ) {
+    this.members.push(new Member(first, last, middle,
+      party, date, enddate, profession));
     this.memberForm.reset()
     // check if current memberform entry is valid
     // insert current member into memberlist
