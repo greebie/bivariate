@@ -13,7 +13,7 @@ import { IntroComponent } from './intro/intro.component';
 import { AddCommitteeComponent } from './add-committee/add-committee.component';
 import { VisualiseComponent } from './visualise/visualise.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { AlertModule } from 'ngx-bootstrap';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { AngularFireModule } from 'angularfire2';
 
 // New imports to update based on AngularFire2 version 4
@@ -44,7 +44,7 @@ const appRoutes: Routes = [
       appRoutes,
       { enableTracing: true } // <-- debugging purposes only
     ),
-    AlertModule.forRoot(),
+    CollapseModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     HttpModule,

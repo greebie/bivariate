@@ -4,7 +4,7 @@ export interface MemberInterface {
   middleName?: string,
   party?: string,
   elected?: Date,
-  finished?: Date,
+  finished?: Date | "present",
   profession?: string,
   riding?: string
 }
@@ -23,13 +23,18 @@ export interface CommitteeInterface {
     membership: Member[]
   }
 
+  export class Present implements Present {
+    display = "present";
+    getDate = new Date();
+    }
+
 export class Member implements MemberInterface {
     firstName: string;
     lastName: string;
     middleName: string;
     party: string;
     elected: Date;
-    finished: Date;
+    finished: Date | "present";
     profession: string;
     riding: string;
     displayName: string;
@@ -39,7 +44,7 @@ export class Member implements MemberInterface {
       middleName?: string,
       party?: string,
       elected?: Date,
-      finished?: Date,
+      finished?: Date | "present",
       profession?: string,
       riding?: string,
     ) {
@@ -48,7 +53,12 @@ export class Member implements MemberInterface {
       this.middleName = middleName;
       this.party = party;
       this.elected = elected;
-      this.finished = finished;
+      if (finished == null) {
+        this.finished = "present";
+      }
+      else {
+        this.finished = <Date>finished;
+      }
       this.profession = profession;
       this.riding = riding;
       this.displayName = lastName + ", " + firstName[0] + middleName[0]
@@ -93,6 +103,5 @@ export class Committee implements CommitteeInterface {
     this.description = description;
     this.membership = membership;
     this.notes = notes;
-
   }
 }

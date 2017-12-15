@@ -3,9 +3,9 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from '@firebase/app';
-import { Committee, Member } from '../models/committee_models';
-import { ReactiveFormsModule, FormsModule, FormGroup,FormControl,Validators,FormBuilder
-} from '@angular/forms';
+import { Committee, Member, Present } from '../models/committee_models';
+import { ReactiveFormsModule, FormsModule, FormGroup,FormControl,Validators,FormBuilder} from '@angular/forms';
+import {ValidateGreaterThan } from './validation-controls';
 
 @Component({
   selector: 'app-add-committee',
@@ -19,17 +19,24 @@ export class AddCommitteeComponent implements OnInit {
   members: Member[] = [];
   memberForm: FormGroup;
   committeeForm: FormGroup;
+  committeeCollapse: Boolean = true;
+  memberCollapse: Boolean = true;
+  nameInvalid:Boolean = false;
+  memberDateInvalid:Boolean = false;
+  existsAlready: Boolean = false;
+  endDate: any;
 
   constructor(public afAuth: AngularFireAuth, public db: AngularFireDatabase) {
     this.committeesRef = db.list<Committee>('/committees')
     this.committees = this.committeesRef.valueChanges();
     this.user = this.afAuth.authState;
+
     this.memberForm = new FormGroup({
-      firstName: new FormControl(),
-      lastName: new FormControl(),
-      middleName: new FormControl(),
+      firstName: new FormControl('', Validators.required),
+      lastName: new FormControl('', Validators.required),
+      middleName: new FormControl('', Validators.required),
       party: new FormControl(),
-      date: new FormControl(),
+      date: new FormControl('', Validators.required),
       enddate: new FormControl(),
       profession: new FormControl()
     })
@@ -41,9 +48,11 @@ export class AddCommitteeComponent implements OnInit {
       name: new FormControl(),
       abbreviation: new FormControl(),
       country: new FormControl(),
+      jurisdiction: new FormControl(),
       description: new FormControl(),
       notes: new FormControl()
     })
+    this.memberDateInvalid = this.memberForm.value.enddate > this.memberForm.value.date;
   }
 
   ngOnInit() {
@@ -61,12 +70,26 @@ export class AddCommitteeComponent implements OnInit {
     this.committeesRef.push(desc);
   }
 
-  addMemberForm(first,
-    last, middle?, party?, date?,
-    enddate?, profession? ) {
-    this.members.push(new Member(first, last, middle,
-      party, date, enddate, profession));
-    this.memberForm.reset()
+  addMemberForm() {
+    let firstName = this.memberForm.value.firstName;
+    let lastName = this.memberForm.value.lastName;
+    let middleName = this.memberForm.value.middleName;
+    var member = new Member(this.memberForm.value.firstName, this.memberForm.value.lastName, this.memberForm.value.middleName,
+      this.memberForm.value.party, this.memberForm.value.date, this.memberForm.value.enddate, this.memberForm.value.profession);
+    var existsAlready = this.members.filter( x => x.firstName == firstName || x.lastName == lastName || x.middleName == middleName);
+    if (this.memberForm.valid && existsAlready.length == 0) {
+      this.memberDateInvalid, this.nameInvalid, this.existsAlready = false;
+      this.members.push(member);
+      this.memberForm.reset();
+    } else {
+      this.existsAlready = existsAlready.length > 0;
+      this.memberDateInvalid = !(this.memberForm.value.enddate == null || this.memberForm.value.enddate > this.memberForm.value.date);
+      this.nameInvalid = [this.memberForm.get('firstName').errors,
+        this.memberForm.get('lastName').errors,
+        this.memberForm.get('middleName').errors].indexOf(null) == -1;
+    }
+
+
     // check if current memberform entry is valid
     // insert current member into memberlist
     // clear the membership form

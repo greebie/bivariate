@@ -1,26 +1,25 @@
 
 <div class="row">
-    <div class="col-lg-7" id="committees">
-    <div class="form-group" [formGroup]="committeeForm">
+    <div class="col-sm-7" id="committees">
+      <div class="form-group bg-light" [formGroup]="committeeForm">
       <h3> Committee information </h3>
-      <div class="col-lg-6">
+      <div class="row">
+      <div class="col-sm-6">
       <label> What is the name of the committee</label>
-      <input id="name" formControlName="name" type="text" class="form-control input-lg" required />
-      <label> Describe this committee </label><br />
-      <textarea id="description" formControlName="description" type="textarea" rows="8" class="form-control"></textarea>
-      <label> Enter the Session Name for grouping purposes <br /> (eg. "Ming Dynasty" or "34th Session of Parliament")</label><br />
-      <input id="session" formControlName="session" type="text" class="form-control input-sm" /><br />
-      <label> When did it start? </label><br />
-      <input id="date" formControlName="date" type="date" class="form-control input-sm" /><br />
-      <label> When did it end? (empty for present)</label><br />
-      <input id="date" formControlName="enddate" type="date" class="form-control input-sm" /><br />
+      <input id="name" formControlName="name" type="text" class="form-control input-sm" required />
+      <label> Give the committee an abbreviated name (so it looks good on a graph)</label>
+      <input id="abbreviation" formControlName="abbreviation" type="text" class="form-control input-sm" required />
+      <label> Give it a formal tag for grouping  (eg. "Ming Dynasty" or "34th Session of Parliament")</label>
+      <input id="session" formControlName="session" type="text" class="form-control input-sm" required />
+      <label> When did it start? </label>
+      <input id="date" formControlName="date" type="date" class="form-control input-sm" />
+      <label> When did it end? (empty for present)</label>
+      <input id="date" formControlName="enddate" type="date" class="form-control input-sm" />
     </div>
-    </div>
-    <div class="col-lg-6">
-
-      <label> Give the committee an abbreviated name<br /> (so it looks good on a graph)</label>
-      <input id="abbreviation" formControlName="abbreviation" type="text" class="form-control input-sm" required /><br /><br />
-      <label> What country can I find this committee? </label><br />
+  <div class="col-sm-6">
+   <button class="btn btn-secondary" (click)="committeeCollapse = !committeeCollapse">Toggle Full Committee Form</button>
+   <div [collapse]="committeeCollapse">
+      <label> What country can I find this committee? </label>
       <select id="country" formControlName="country" class="form-control input-sm">
         <option value="au">au / Australia</option>
         <option value="ca">ca / Canada</option>
@@ -33,50 +32,72 @@
         <option value="nz">nz / New Zealand</option>
         <option value="uk">uk / United Kingdom</option>
         <option value="us">us / United States</option>
-      </select><br />
-      <label> Is there a more specific jurisdiction for this committee?<br />  (Region, State/Province, City etc. )</label><br />
-      <input id="jurisdiction" formControlName="jurisdiction"  class="form-control input-sm" /><br />
-
+      </select>
+      <label>  How about a jurisdiction (State/Province, City etc. )</label>
+      <input id="jurisdiction" formControlName="jurisdiction"  class="form-control input-s" /><br />
+      <label> Describe this committee </label>
+      <textarea id="description" formControlName="description" type="textarea" rows="5" class="form-control"></textarea>
     <label> Any other notes you want to provide? </label>
-    <textarea id="notes" formControlName="notes" class="form-control" rows="10"> </textarea>
-    </div>
-</div>
-  <div class="col-lg-4">
+    <textarea id="notes" formControlName="notes" class="form-control" rows="5"> </textarea>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  <div class="col-sm-5">
+
     <h3> Members </h3>
-    <p> You can add members to your committee here. Entries here will be used to map committees against each other. </p>
-    <div class="form-group" [formGroup]="memberForm">
-      <div class="col-lg-4">
+    <button class="btn btn-secondary" (click)="memberCollapse = !memberCollapse">Toggle Full Member Form</button>
+    <p> You can add members to your committee here. Entries here will be used to map committees against each other. (Leave end date input empty for current members.) </p>
+    <form class="form-group" [formGroup]="memberForm" (ngSubmit)="addMemberForm()">
+      <div class="row">
+        <div *ngIf="nameInvalid" class="text-warning">
+              Full Name + Middle Initial is Required</div>
+        <div *ngIf="existsAlready" class="text-warning">
+                    Name seems to exist already (multiple entries not supported for now)</div>
+      <div class="col-sm-4">
     <label>First Name (required):</label>
+
     <input #first id="MemberFirst" formControlName="firstName" type="text" class="form-control input-sm" required />
   </div>
-  <div class="col-lg-4">
+  <div class="col-sm-4">
     <label>Last Name (required):</label>
     <input #last id="MemberLast" formControlName="lastName" type="text" class="form-control input-sm" required />
 </div>
-<div class="col-lg-4">
+<div class="col-sm-4">
     <label>Middle Name (init required):</label>
     <input #middle id="MemberMiddle" formControlName="middleName" type="text" class="form-control input-sm" />
 </div>
-<div class="col-lg-6">
-    <label>What Affiliation (eg political party)?</label>
-    <input #party id="MemberParty" formControlName="party" type="text" class="form-control input-sm" />
-</div>
-<div class="col-lg-6">
-    <label>What Profession (eg Doctor, Artist etc.)?</label>
-    <input #profession id="MemberProfession" formControlName="profession" type="text" class="form-control input-sm" />
-</div>
-<div class="col-lg-6">
+<div class="row">
+  <div *ngIf="memberDateInvalid" class="text-warning">
+        End date must be later than start date</div>
+<div class="col-sm-6">
     <label>When did they join? </label>
     <input #date id="MemberDate" formControlName="date" type="date" class="form-control input-sm" />
 </div>
-<div class="col-lg-6">
+<div class="col-sm-6">
     <label>When did they finish? </label>
-    <input #enddate id="MemberEnddate" formControlName="enddate" type="date" class="form-control input-sm" />
+    <input #enddate id="MemberEnddate" formControlName="enddate" type="date" class="form-control input-sm"/>
+    <button class="btn btn-primary" type="submit">Add Member &gt;</button>
 </div>
-    <button (click)="addMemberForm(first.value,last.value, middle.value, party.value, date.value, enddate.value, profession.value)">Add Another Member &gt;</button>
+</div>
+</div>
+<div [collapse]="memberCollapse">
+<div class="row">
+<div class="col-sm-6">
+    <label>What Affiliation (eg political party)?</label>
+    <input #party id="MemberParty" formControlName="party" type="text" class="form-control input-sm" />
+</div>
+<div class="col-sm-6">
+    <label>What Profession (eg Doctor, Artist etc.)?</label>
+    <input #profession id="MemberProfession" formControlName="profession" type="text" class="form-control input-sm" />
+</div>
+</div>
 
-  </div>
+</div>
+</form>
+
   <ul id="members" *ngFor="let member of members" class="list-group">
-  <li class="list-group-item">{{member.displayName}} ({{member.elected}} - {{member.finished}})</ul>
+  <li class="list-group-item">{{member.displayName}} ({{member.elected}} to {{member.finished}})</ul>
   </div>
 </div>
