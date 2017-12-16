@@ -12,7 +12,7 @@ export interface MemberInterface {
 export interface CommitteeInterface {
     session: string,
     date: Date,
-    enddate: Date,
+    enddate: Date | Present,
     partyInPower?: string,
     name: string,
     abbreviation: string,
@@ -68,29 +68,29 @@ export class Member implements MemberInterface {
 export class Committee implements CommitteeInterface {
   session: string;
   date:Date;
-  enddate: Date;
-  partyInPower: string;
+  enddate: Date | Present;
   name: string;
   abbreviation: string;
+  membership: Member[];
+  partyInPower: string;
   country: string;
   jurisdiction: string;
   description: string;
   notes: string;
-  membership: Member[];
+
 
   constructor (
     session: string,
     date: Date,
-    enddate: Date,
-    partyInPower: string,
+    enddate: Date | Present,
     name: string,
     abbreviation: string,
-    country: string,
-    jurisdiction: string,
-    description: string,
-    notes: string,
-    membership: Member[]
-
+    membership: Member[],
+    partyInPower?: string,
+    country?: string,
+    jurisdiction?: string,
+    description?: string,
+    notes?: string
   ) {
     this.session = session;
     this.date = date;

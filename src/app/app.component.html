@@ -1,5 +1,16 @@
 
 <div class="container">
+  <div class="row">
+    <div class="col-sm-11">
+      <div *ngIf="(user | async)?.uid"> Welcome {{(user | async)?.displayName}}! </div>
+    </div>
+    <div class="col-sm-1">
+    <button (click)="login()" *ngIf="!(user | async)?.uid">Login Using Google</button>
+    <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
+  </div>
+  </div>
+
+
     <div class="jumbotron">
       <h2> {{title}} </h2>
       <p> See the interelationship between committees and their membership </p>

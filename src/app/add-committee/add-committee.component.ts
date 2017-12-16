@@ -14,12 +14,14 @@ import {ValidateGreaterThan } from './validation-controls';
 })
 export class AddCommitteeComponent implements OnInit {
   user: Observable<firebase.User>;
-  committees: Observable<Committee[]>;
+  committeesInput: Committee;
   committeesRef: AngularFireList<Committee>
   members: Member[] = [];
+  membersExist = false;
   memberForm: FormGroup;
   committeeForm: FormGroup;
   committeeCollapse: Boolean = true;
+  committeeDateInvalid: Boolean = false;
   memberCollapse: Boolean = true;
   nameInvalid:Boolean = false;
   memberDateInvalid:Boolean = false;
@@ -28,7 +30,7 @@ export class AddCommitteeComponent implements OnInit {
 
   constructor(public afAuth: AngularFireAuth, public db: AngularFireDatabase) {
     this.committeesRef = db.list<Committee>('/committees')
-    this.committees = this.committeesRef.valueChanges();
+    // this.committees = this.committeesRef.valueChanges();
     this.user = this.afAuth.authState;
 
     this.memberForm = new FormGroup({
@@ -52,7 +54,7 @@ export class AddCommitteeComponent implements OnInit {
       description: new FormControl(),
       notes: new FormControl()
     })
-    this.memberDateInvalid = this.memberForm.value.enddate > this.memberForm.value.date;
+
   }
 
   ngOnInit() {
@@ -75,7 +77,7 @@ export class AddCommitteeComponent implements OnInit {
     let lastName = this.memberForm.value.lastName;
     let middleName = this.memberForm.value.middleName;
     var member = new Member(this.memberForm.value.firstName, this.memberForm.value.lastName, this.memberForm.value.middleName,
-      this.memberForm.value.party, this.memberForm.value.date, this.memberForm.value.enddate, this.memberForm.value.profession);
+      this.memberForm.value.party, this.memberForm.value.date, this.memberForm.value.enddate, this.memberForm.value.profession, null);
     var existsAlready = this.members.filter( x => x.firstName == firstName || x.lastName == lastName || x.middleName == middleName);
     if (this.memberForm.valid && existsAlready.length == 0) {
       this.memberDateInvalid, this.nameInvalid, this.existsAlready = false;
@@ -83,17 +85,35 @@ export class AddCommitteeComponent implements OnInit {
       this.memberForm.reset();
     } else {
       this.existsAlready = existsAlready.length > 0;
-      this.memberDateInvalid = !(this.memberForm.value.enddate == null || this.memberForm.value.enddate > this.memberForm.value.date);
+      this.memberDateInvalid = !(this.memberForm.value.enddate == null ||
+        this.memberForm.value.enddate > this.memberForm.value.date);
       this.nameInvalid = [this.memberForm.get('firstName').errors,
         this.memberForm.get('lastName').errors,
         this.memberForm.get('middleName').errors].indexOf(null) == -1;
     }
-
-
-    // check if current memberform entry is valid
-    // insert current member into memberlist
-    // clear the membership form
-    // append membernote above form
   }
 
+  addCommitteeForm() {
+    if (this.committeeForm.valid && this.members.length > 0) {
+      let committee = new Committee(this.committeeForm.value.session,
+        this.committeeForm.value.date, this.committeeForm.value.enddate,
+        this.committeeForm.value.name, this.committeeForm.value.abbreviation, this.members,
+      this.committeeForm.value.partyInPower, this.committeeForm.value.country,
+      this.committeeForm.value.jurisdiction, this.committeeForm.value.description,
+      this.committeeForm.value.notes);
+      Object.keys(committee).map(function(key, index) {
+        if (typeof committee[key] == 'undefined') committee[key] = null;
+      });
+      this.Save(committee);
+      this.members = [];
+      this.memberForm.reset();
+      this.committeeForm.reset();
+    } else {
+      this.membersExist = this.members.length > 0;
+      this.committeeDateInvalid = !(this.committeeForm.value.enddate == null ||
+        this.committeeForm.value.enddate > this.committeeForm.value.date);
+
+    }
+
+  }
 }
