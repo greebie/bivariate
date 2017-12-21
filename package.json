@@ -21,6 +21,8 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
+    "@ngrx/core": "^1.2.0",
+    "@ngrx/store": "^2.2.3",
     "angular2-collapsible": "0.0.44",
     "angularfire2": "^5.0.0-rc.3",
     "bootstrap": "^4.0.0-beta.2",
@@ -30,6 +32,7 @@
     "ngx-bootstrap": "^2.0.0-rc.0",
     "numericjs": "^1.2.6",
     "rxjs": "^5.5.5",
+    "venn.js": "^0.2.18",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
@@ -51,6 +54,6 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.0.4",
     "tslint": "~5.3.2",
-    "typescript": "~2.3.3"
+    "typescript": "^2.7.0-dev.20171216"
   }
 }

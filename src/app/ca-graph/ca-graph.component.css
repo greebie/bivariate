@@ -1,0 +1,37 @@
+div.graphTitle {
+  float:right;
+}
+
+
+#graph svg {
+    background: #999900;
+    display: inline-block;
+    vertical-align: top; /* here */
+    border: 1px;
+    margin: 3px 3px 3px 3px;
+}
+#summary {
+  float: right;
+  width: 600px;
+
+}
+
+div.fileNames {
+  float:right;
+  vertical-align: bottom;
+}
+
+div.dimensions {
+  float:right;
+}
+
+svg circle.column {
+  opacity: 0.0;
+  fill: "blue";
+}
+
+svg circle.row {
+  opacity: 0.3;
+  fill: rgba(255, 0, 0, 0.5);
+
+}

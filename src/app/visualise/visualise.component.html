@@ -1,1 +1,33 @@
-<p>Hello!</p>
+<div class="row">
+  <div class="col-sm-10">
+    <h3> Visualize Bivariate </h3>
+    <button *ngIf="!showPublicGroups" (click)="showPublicGroups = !showPublicGroups"> Toggle Public </button>
+    <button *ngIf="showPublicGroups" (click)="showPublicGroups = !showPublicGroups"> Toggle Private</button>
+
+  <form id="sessionForm" class="form-inline bg-light" [formGroup]="groupForm" (ngSubmit)="addGroup()">
+    <div class="form-group" *ngIf="(userid == null || showPublicGroups)">
+    <label for="psession"> Add a public group to the list  </label>
+    <select id="psession" formControlName="psession" class="form-control input-sm">
+      <option *ngFor="let pset of psets | async" [ngValue]="pset">{{pset}}
+      </select>
+    </div>
+    <div class="form-group" *ngIf="(userid != null && !showPublicGroups)">
+  <label for="session"> Add your own group to the list </label>
+    <select id="session" formControlName="session" class="form-control input-sm">
+      <option *ngFor="let set of sets | async" [ngValue]="set">{{set}}
+      </select>
+    </div>
+      <button class="btn btn-primary" type="submit">AddGroup</button>
+  </form>
+    <table>
+      <tr *ngFor="let committee of committees | async">
+        <td> {{committee.name}}({{committee.abbreviation}})
+        </tr>
+      </table>
+      <table>
+        <tr *ngFor="let pcommittee of pcommittees | async">
+          <td>{{pcommittee.name}}({{pcommittee.abbreviation}})
+        </tr>
+    </table>
+  </div>
+</div>

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Observable';
 import * as firebase from '@firebase/app';
 import { Committee, Member, Present } from '../models/committee_models';
 import { ReactiveFormsModule, FormsModule, FormGroup,FormControl,Validators,FormBuilder} from '@angular/forms';
 import {ValidateGreaterThan } from './validation-controls';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-add-committee',
@@ -27,9 +27,12 @@ export class AddCommitteeComponent implements OnInit {
   memberDateInvalid:Boolean = false;
   existsAlready: Boolean = false;
   endDate: any;
+  userid: string;
 
-  constructor(public afAuth: AngularFireAuth, public db: AngularFireDatabase) {
-    this.committeesRef = db.list<Committee>('/committees')
+  constructor(public afAuth: AuthService, public db: AngularFireDatabase) {
+    if (!afAuth.authState) { this.userid = 'guest' }
+    else { this.userid = this.afAuth.authState.uid }
+    this.committeesRef = db.list<Committee>( '/' + this.userid + '/committees')
     // this.committees = this.committeesRef.valueChanges();
     this.user = this.afAuth.authState;
 
@@ -60,14 +63,6 @@ export class AddCommitteeComponent implements OnInit {
   ngOnInit() {
   }
 
-  login() {
-    this.afAuth.auth.signInAnonymously();
-  }
-
-  logout() {
-    this.afAuth.auth.signOut();
-  }
-
   Save(desc: Committee) {
     this.committeesRef.push(desc);
   }
@@ -78,7 +73,7 @@ export class AddCommitteeComponent implements OnInit {
     let middleName = this.memberForm.value.middleName;
     var member = new Member(this.memberForm.value.firstName, this.memberForm.value.lastName, this.memberForm.value.middleName,
       this.memberForm.value.party, this.memberForm.value.date, this.memberForm.value.enddate, this.memberForm.value.profession, null);
-    var existsAlready = this.members.filter( x => x.firstName == firstName || x.lastName == lastName || x.middleName == middleName);
+    var existsAlready = this.members.filter( x => x.firstName == firstName && x.lastName == lastName && x.middleName == middleName);
     if (this.memberForm.valid && existsAlready.length == 0) {
       this.memberDateInvalid, this.nameInvalid, this.existsAlready = false;
       this.members.push(member);
