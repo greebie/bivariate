@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, Input } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireAuth} from 'angularfire2/auth';
 import { Observable } from 'rxjs/Rx';
@@ -24,8 +24,8 @@ export class VisualiseComponent implements OnInit {
   userid;
   sets:Observable<string[]>;
   psets: Observable<string[]>;
-  committees:Observable<Committee[]>;
-  pcommittees:Observable<Committee[]>;;
+  committees: Committee[];
+  pcommittees: Committee[];
   members: string[];
   groupForm: FormGroup;
   @Input()
@@ -62,17 +62,18 @@ export class VisualiseComponent implements OnInit {
     this.setUpSelects();
   }
 
+  ngOnDestroy() {
+  }
+
   setUpSelects() {
     this.public = this.db.list<Committee>('/guest/committees').valueChanges()
     this.private = this.db.list<Committee>(this.currentUserId + '/committees').valueChanges();
-    console.log(this.private);
     this.psets = this.public
       .map(x => x.map(c => c.session)
       .filter((m, n, o) => o.indexOf(m) === n));
     this.sets = this.private
       .map(x => x.map(c => c.session)
       .filter((m, n, o) => o.indexOf(m) === n));
-    console.log(this.sets);
   }
 
   ngOnChanges(changes) {
@@ -88,16 +89,30 @@ export class VisualiseComponent implements OnInit {
   }
 
   addGroup() {
-    this.psession.add (this.groupForm.value.psession);
-    this.session.add(this.groupForm.value.session);
-    // check for authenticated user first
-    // create two different lists - one for public, one for private.
-    // use ngIf to hide non-public stuff.
+    if (this.groupForm.value.session) this.session.add (this.groupForm.value.session);
+    if (this.groupForm.value.psession) this.psession.add (this.groupForm.value.psession);
 
-    this.pcommittees = this.public
-      .map(x => x.filter(z => this.session.has(z.session)));
-    this.committees =  this.private
-      .map(x => x.filter(z => this.session.has(z.session)));
+    this.private
+      .subscribe( x => {
+        this.committees = x.filter(z =>
+          (this.session.has(z.session))
+        )},
+        err => {});
+    this.public
+          .subscribe( n => {
+            this.pcommittees = n.filter(p =>
+              (this.psession.has(p.session)));
+              this.committees = this.committees.concat(this.pcommittees);
+          },
+          err => {},
+          () => {}
+    );
+
+    const both = this.private.concat(this.public)
+    const y = both.subscribe( x => {
+        console.log( x.filter(z =>
+        (this.session.has(z.session) || this.psession.has(z.session))))
+      });
     }
 
   createMatrix() {
