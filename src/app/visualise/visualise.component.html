@@ -4,30 +4,35 @@
 
   <form id="sessionForm" class="form-inline bg-light" [formGroup]="groupForm" (ngSubmit)="addGroup()">
     <div class="btn-group btn-group-sm">
-    <button *ngIf="!showPublicGroups" class="btn btn-secondary" (click)="showPublicGroups = !showPublicGroups"> Toggle Public </button>
-    <button *ngIf="showPublicGroups" class="btn btn-secondary"(click)="showPublicGroups = !showPublicGroups"> Toggle Private</button></div>
-   <div class="form-group" *ngIf="(userid == null || showPublicGroups)">
+    <button *ngIf="!showPublicGroups || !userid" class="btn btn-secondary" (click)="showPublicGroups = !showPublicGroups"> Toggle Public </button>
+    <button *ngIf="showPublicGroups && userid" class="btn btn-secondary" (click)="showPublicGroups = !showPublicGroups"> Toggle Private</button></div>
+   <div class="form-group" *ngIf="(!userid || showPublicGroups)">
 
     <label for="psession"> Add a public group to the list  </label>
     <select id="psession" formControlName="psession" class="form-control input-sm">
       <option *ngFor="let pset of psets | async" [ngValue]="pset">{{pset}}
       </select>
     </div>
-    <div class="form-group" *ngIf="(userid != null && !showPublicGroups)">
+    <div class="form-group" *ngIf="(userid && showPublicGroups == false)">
   <label for="session"> Add your own group to the list </label>
     <select id="session" formControlName="session" class="form-control input-sm">
       <option *ngFor="let set of sets | async" [ngValue]="set">{{set}}
       </select>
     </div>
       <button class="btn btn-primary" type="submit">AddGroup</button>
-  </form></div>
+  </form>
+</div>
+<div class="col-sm-2">
+  <div>Total Committees: {{totalCols}}</div>
+  <div>Total Members: {{totalRows}}</div>
+</div>
 </div>
   <div class="row">
     <div class="col-sm-2">
     <table class="table-sm table-hover table-bordered table-info table-striped rounded">
       <tr *ngFor="let committee of committees" class="spacer">
-        <th class="table-primary"> {{committee.abbreviation}}
-        <td class="pt-6"> <i>{{committee.name}}</i>
+        <th id="{{committee.abbreviation}}_{{committee.session}}" (click)="itemClicked(committee)" class="table-primary"> {{committee.abbreviation}}
+        <td id="{{committee.abbreviation}}_{{committee.session}}" (click)="itemClicked(committee)" class="pt-6"> <i>{{committee.name}}</i>
         </tr>
     </table>
   </div>

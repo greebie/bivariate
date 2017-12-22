@@ -9,19 +9,21 @@
     <button (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
   </div>
   </div>
-
-
-    <div class="jumbotron">
-      <h2> {{title}} </h2>
-      <p> See the interelationship between committees and their membership </p>
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+      <h2 class="display-3 text-primary"> {{title}} </h2>
+      <p class="lead"> See the interelationship between committees and their membership </p>
     </div>
+  </div>
 <!-- Create navigation bar here -->
 <div class="row">
-<a routerLink="/"> Home </a> |
-<a routerLink="/add">Add a Committee</a> |
-<a routerLink="/visualise"> Visualize </a> |
-<a href="/comment"> Contact </a> |
-<a href="/about"> Explanation </a>
+  <ul class="nav nav-tabs">
+    <li class="nav-item"><a class="nav-link" routerLink="/"> Home </a> </li>
+<li class="nav-item"><a class="nav-link" routerLink="/add">Add a Committee</a> </li>
+<li class="nav-item"><a class="nav-link" routerLink="/visualise"> Visualize </a></li>
+<li class="nav-item"><a class="nav-link disabled" href="/comment"> Contact </a></li>
+<li class="nav-item"><a class="nav-link disabled" href="/about"> Explanation </a></li>
+</ul>
 </div>
 
   <router-outlet></router-outlet>

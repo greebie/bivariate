@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, NgZone, Component, Input, OnInit, Output, AfterViewInit, AfterContentChecked } from '@angular/core';
 import * as d3 from 'd3';
-import { GenerateAutDataService } from '../services/generate-aut-data.service';
+import { HandleState } from '../services/handle-state.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { VennDiagram } from 'venn.js';
@@ -43,7 +43,7 @@ export class CaGraphComponent implements OnInit, AfterViewInit, AfterContentChec
   @Input() fileCount: number = 0;
 
   constructor (
-    private _autDataService:GenerateAutDataService,
+    private _autDataService:HandleState,
     private _cdRef:ChangeDetectorRef,
     private _ngZone: NgZone,
     calc: CalcService,

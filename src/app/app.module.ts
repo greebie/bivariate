@@ -3,13 +3,19 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {HttpModule} from '@angular/http';
+import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule }   from '@angular/forms';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { StoreModule } from '@ngrx/store';
 
 // Services
 import { CalcService } from './services/calc.service';
 import { AuthService } from './services/auth.service';
+import { HandleState } from './services/handle-state.service';
+
+// _reducers
+
+import {committeesReducer} from './_reducers/reducer';
 
  // Environment
 import { environment } from '../environments/environment';
@@ -51,19 +57,18 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
-    RouterModule.forRoot(
-      appRoutes,
-      { enableTracing: true } // <-- debugging purposes only
-    ),
+    RouterModule.forRoot(appRoutes),
+    StoreModule.provideStore({committees: committeesReducer} ),
     CollapseModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
     AngularFireModule.initializeApp(environment.firebase, 'Bivariate'),
     AngularFireDatabaseModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+
   ],
-  providers: [CalcService, AuthService],
+  providers: [CalcService, AuthService, HandleState],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthService} from './services/auth.service';
@@ -19,7 +19,7 @@ export class AppComponent {
   items: AngularFireList<any[]>;
   msgVal: string = '';
   authState: any = null;
-
+  
   constructor(private afAuth: AngularFireAuth,
               private auth: AuthService,
               private db: AngularFireDatabase){
@@ -34,5 +34,6 @@ export class AppComponent {
 }
 logout() {
   this.afAuth.auth.signOut();
+  window.location.reload();
 }
 }

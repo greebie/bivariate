@@ -31,7 +31,8 @@
     "ng-bootstrap": "^1.6.3",
     "ngx-bootstrap": "^2.0.0-rc.0",
     "numericjs": "^1.2.6",
-    "rxjs": "^5.5.5",
+    "rxjs": "^5.5.6",
+    "save": "^2.3.2",
     "venn.js": "^0.2.18",
     "zone.js": "^0.8.14"
   },
