@@ -156,7 +156,6 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
         // and make this.committees an Observable.
               this.committees = Observable.of(committees.concat(pcommittees));
           });
-      this.initGraph();
     }
 
   addCommitteeToGraph(committee:Committee) {
@@ -214,21 +213,14 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
           .map(col => {
             var present = col.membership.map( member => member.displayName)
               .filter(y => y.indexOf(x) > -1);
-            console.log(present)
             var isPresent = present.length == 0 ? 0 : 1;
             z.push(isPresent);
           }));
       matrix.push(z);})
     );
-    console.log(matrix);
     this.matrix = Observable.of([...matrix]);
-    try {
-      this.calc.REMOVESINGLES = false;
-      this.calc.ca(this.matrix, this.rownames, this.colnames);
-    console.log(this.calc.REMOVESINGLES) }
-    catch (Error) {
-      this.calc.ca(this.matrix, this.rownames, this.colnames);
-    }
+    this.calc.REMOVESINGLES = false;
+    this.calc.ca(this.matrix, this.rownames, this.colnames);
   }
 
   createSet () {
@@ -242,7 +234,6 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
 
   show_graph() {
     this.initGraph();
-
     var members = [];
     var colnames = [];
     this.colnames.subscribe(sub =>
@@ -383,6 +374,9 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
   createGraph() {
     D3.selectAll("svg").remove();
     var rowcol = this.row_coordinates.concat(this.col_coordinates);
+    console.log(rowcol);
+    console.log(this.col_coordinates);
+    console.log(this.row_coordinates);
     var w = 700;
     var h = 700;
     var svg = D3.select("#graph")
@@ -401,11 +395,10 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
           .range([0, h]);
 
     var nodecol = svg.selectAll("circle")
-      .attr("class", "row")
       .data(this.col_coordinates)
       .enter()
       .append("circle")
-      .attr("class", "column")
+      .attr("class", "column_coords")
       .attr("cx", function(d) { return xScale(d[0]); })
       .attr("cy", function(d) { return yScale(d[1]); })
       .attr("r", 5)
@@ -447,43 +440,43 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       .style("text-anchor", "middle")
       .text("Dimension 1 (" + this.dimensions[0] + "%)");
 
-
     var coltext = svg.append("g")
-          .selectAll("text")
-          .append("text")
-          .data(this.col_coordinates)
-          .enter()
-          .append("text")
-          .attr("x", function(d) { return xScale(d[0]) - paddingx/2; })
-          .attr("y", function(d) { return yScale(d[1]- paddingy/2); })
-          .style("stroke-width", 0)
-          .style("fill", "rgb(255, 1, 1)")
-          .style("opacity", 0.8)
-          .text(function (d) { return d[2];});
+      .selectAll("text")
+      .append("text")
+      .data(this.col_coordinates)
+      .enter()
+      .append("text")
+      .attr("x", function(d) { return xScale(d[0]) - paddingx/2; })
+      .attr("y", function(d) { return yScale(d[1]- paddingy/2); })
+      .style("stroke-width", 0)
+      .style("fill", "rgb(255, 1, 1)")
+      .style("opacity", 0.8)
+      .text(function (d) { return d[2];});
 
     var tooltip = D3.select("body")
-          .append("div")
-          .style("position", "absolute")
-          .style("z-index", "10")
-          .style("visibility", "hidden")
-          .text("a simple tooltip");
+      .append("div")
+      .style("position", "absolute")
+      .style("z-index", "10")
+      .style("visibility", "hidden")
+      .text("a simple tooltip");
 
-    var noderow = svg.selectAll("circle")
+    var noderow = svg.append("g")
+      .selectAll("circle")
       .data(this.row_coordinates)
       .enter()
       .append("circle")
-      .attr("class", "row")
+      .attr("class", "row_coords")
       .attr("cx", function (q) { return xScale(q[0]); })
       .attr("cy", function (q) {return yScale(q[1]); })
       .attr("r", 4)
       .attr("id", function (q,i) {return i})
       .style("fill", "rgb(1, 1, 255)")
-      .style("opacity", 0.1)
+      .style("opacity", 0.5)
       .on("mouseover", function(datum) {
         D3.select(this)
           .attr("r", 10)
           .style("fill", "rgb(1, 1, 255)")
-          .style("opacity", 0.7);
+          .style("opacity", 0.8);
         return tooltip.style("visibility", "visible")
           .text(datum[2])
       })
