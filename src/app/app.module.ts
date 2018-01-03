@@ -27,7 +27,6 @@ import { IntroComponent } from './intro/intro.component';
 import { AddCommitteeComponent } from './add-committee/add-committee.component';
 import { VisualiseComponent } from './visualise/visualise.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { CaGraphComponent } from './ca-graph/ca-graph.component';
 
 
 
@@ -52,8 +51,7 @@ const appRoutes: Routes = [
     AddCommitteeComponent,
     VisualiseComponent,
     PageNotFoundComponent,
-    IntroComponent,
-    CaGraphComponent
+    IntroComponent
   ],
   imports: [
     BrowserModule,

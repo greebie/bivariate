@@ -32,32 +32,40 @@ import {HandleState} from '../services/handle-state.service';
 @Component({
   selector: 'app-visualise',
   templateUrl: './visualise.component.html',
-  styleUrls: ['./visualise.component.css']
+  styleUrls: ['./visualise.component.css'],
 })
 
 export class VisualiseComponent implements OnInit, AfterViewInit {
   @Input() showPublicGroups: boolean = false;
+  @Input() mbs: Member[];
+
+  // Public and Private Committee Objects from db.
   public: Observable<Committee[]>;
-  private;
-  userid;
-  totalCols;
-  totalRows;
-  sets:Observable<string[]>;
+  private: Observable<Committee[]>;
+  userid: string;
+  // Groupings.  Could be tags in future.
+  sets: Observable<string[]>;
   psets: Observable<string[]>;
-  committees: Committee[] = [];
-  pcommittees: Committee[] = [];
-  members: Set<string>;
+  // Groups selected from sets & psets
+  @Input() session: Set<string> = new Set();
+  @Input() psession: Set<string> = new Set();
+  // Committees available to the the graph
+  // (After groups are selected)
+  state;
+  committees: Observable<Committee[]>;
+  members: Observable<Set<Member>>;
+  // Total number of committees (columns)
+  // and members (rows)
+  totalCols: number;
+  totalRows: number;
+  // Data from the form produced by sets
   groupForm: FormGroup;
-  @Input()
-  session: Set<string> = new Set();
-  psession: Set<string> = new Set();
-  selectedSession;
-  CA;
-  rownames: Set<string> = new Set();
-  colnames: Set<string> = new Set();
-  matrix;
-  authState;
-  summary;
+
+  rownames: Observable<Set<string>>;
+  colnames: Observable<Set<string>>;
+  matrix: Observable<number[][]>;
+  authState: firebase.User;
+  summary: string;
   memberList;
   dimensions;
   col_coordinates;
@@ -80,7 +88,6 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
     this.auth.authState.subscribe((auth) => {
       this.authState = auth
     });
-
   }
 
   compareSession (a, b) {
@@ -109,6 +116,16 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       .filter((m, n, o) => o.indexOf(m) === n));
   }
 
+  initGraph() {
+    D3.selectAll("svg").remove();
+    var w = 700;
+    var h = 700;
+    var svg = D3.select("#graph")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+  }
+
   ngOnChanges(changes) {
 
   }
@@ -119,39 +136,38 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
 
   get currentUserId(): string {
     this.authenticated ? this.showPublicGroups = false : this.showPublicGroups = true;
-    return this.authenticated ? this.authState.uid : false;
+    return this.authenticated ? this.authState.uid : '/guest';
   }
 
   addGroup() {
     if (this.groupForm.value.session) this.session.add (this.groupForm.value.session);
     if (this.groupForm.value.psession) this.psession.add (this.groupForm.value.psession);
-
-    this.private
-      .subscribe( x => {
-        this.committees = x.filter(z =>
+    var committees = [];
+    var pcommittees = [];
+    this.private.subscribe( x => {
+        committees = x.filter(z =>
           (this.session.has(z.session))
-        )},
-        err => {});
+        )});
     this.public
           .subscribe( n => {
-            this.pcommittees = n.filter(p =>
+            pcommittees = n.filter(p =>
               (this.psession.has(p.session)));
-              this.committees = this.committees.concat(this.pcommittees);
-          },
-          err => {},
-          () => {}
-    );
+        // TODO  Change this.committees to var committees
+        // and make this.committees an Observable.
+              this.committees = Observable.of(committees.concat(pcommittees));
+          });
+      this.initGraph();
     }
-    // call this "add committee"
-  itemClicked(committee:Committee) {
 
-    committee.membership.forEach(x =>
+  addCommitteeToGraph(committee:Committee) {
+    // probably get rid of this.
+    /*committee.membership.forEach(x =>
       this.rownames.add(x.displayName)
     );
     this.colnames.add(committee.abbreviation)
-    this.totalCols = this.colnames.size;
-    this.totalRows = this.rownames.size;
-
+    this.totalCols = this.colnames.count()
+    this.totalRows = this.rownames.count() */
+    // until here.
     try {
       var eventExists = this._hs.checkCommitteeInState(committee);
     }
@@ -164,39 +180,92 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
     else {
       this._hs.removeCommittee(committee);
     }
+    this.state = this._hs.getCommitteeState();
+    this.state.subscribe(x => {
+      let setcols = new Set();
+      x.map (y => setcols.add(y.abbreviation));
+      this.colnames = Observable.of(setcols);
+    });
+    this.members = this.getCommitteeMemberNames();
+    this.members.subscribe( x => {
+      let setnames = new Set();
+      x.forEach (y => {setnames.add( <string>y.displayName)});
+      this.rownames = Observable.of(setnames);
+    }
+  );
+  this.createMatrix();
+  this.show_graph();
+  }
+
+  getCommitteeMemberNames (): Observable<Set<Member>> {
+    var members: Set<Member> = new Set();
+    this.state.subscribe(sub => {
+      sub.map( y => {
+        y.membership.map( z =>
+      {members.add (z)})})});
+    return Observable.of(members);
   }
 
   createMatrix() {
     var matrix = []
-      this.rownames.forEach(x => {
+      this.rownames.subscribe( sub => sub.forEach((x) => {
         var z = [];
-        for (var i=0; i < this.members.size; i++){
-          z.push (this.members[i].indexOf(x) == -1 ? 0 : 1);
-          }
-        matrix.push(z);
-      });
-    this.matrix = [...matrix];
+        this.state.subscribe(sub => sub
+          .map(col => {
+            var present = col.membership.map( member => member.displayName)
+              .filter(y => y.indexOf(x) > -1);
+            console.log(present)
+            var isPresent = present.length == 0 ? 0 : 1;
+            z.push(isPresent);
+          }));
+      matrix.push(z);})
+    );
+    console.log(matrix);
+    this.matrix = Observable.of([...matrix]);
+    try {
+      this.calc.REMOVESINGLES = false;
+      this.calc.ca(this.matrix, this.rownames, this.colnames);
+    console.log(this.calc.REMOVESINGLES) }
+    catch (Error) {
+      this.calc.ca(this.matrix, this.rownames, this.colnames);
+    }
   }
 
   createSet () {
     let membersArray = [].concat(this.members)
       .filter(function(n){ return n != undefined })
       .map(x => x.displayName);
-    const membersSet = new Set(membersArray);
+    const membersSet = Observable.of(new Set(membersArray));
     //this.rownames = membersSet;
     return membersSet;
   }
 
   show_graph() {
-    this.members = this.createSet()
+    this.initGraph();
+
+    var members = [];
+    var colnames = [];
+    this.colnames.subscribe(sub =>
+      colnames = Array.from(sub)
+    )
+    this.state.subscribe (sub =>
+      sub.forEach(comm => {
+        var memberset = [];
+        comm.membership.map( member =>
+          memberset.push(member.displayName)
+        )
+        members.push(memberset);
+      }
+    ));
     if (!this.matrix){
     } else {
       this.createMatrix();
     }
-  switch(this.committees.length) {
-    case 0:
-      D3.selectAll("svg").remove();
-      this.memberList = null;
+    var s: number = this.calc.matrix != undefined ? this.calc.matrix[0].length : 0;
+    switch(s) {
+      case 0:
+        D3.selectAll("svg").remove();
+      var memberList = null;
       this.summary = `This demo produces either a Venn Diagram
         or a Correspondence Analysis based on the collections
         (on the left) and the urls they contain.
@@ -204,10 +273,10 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
     break;
 
     case 1:
-      this.memberList = this.members[0];
+      var memberList = members[0];
       D3.selectAll("svg").remove();
-      this.summary = `The file you selected is ` + this.memberList[0] +
-        `. It has ` + this.memberList.length + ` urls extracted (most used
+      this.summary = `The file you selected is ` + memberList[0] +
+        `. It has ` + memberList.length + ` urls extracted (most used
           shown below).  Click one or two more collections to see a Venn
           Diagram. Click three more to see a Correspondence Analysis.`;
       //this.membersList.map(x=> this.summary.concat("<li>"+ x + "</li>"));
@@ -215,14 +284,14 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
 
     case 2:
       this.summary = null;
-      this.memberList = null;
+      var memberList = null;
       D3.selectAll("svg").remove();
-      var A = new Set(this.members[0]);
-      var B = new Set(this.members[1]);
-      let AB = new Set([...this.members[0]].filter(x => B.has(x)));
-      var sets = [ {sets: [this.colnames[0]], size: A.size-AB.size},
-         {sets: [this.colnames[1]], size: B.size-AB.size},
-         {sets: [this.colnames[0], this.colnames[1]], size: AB.size}];
+      var A = new Set(members[0]);
+      var B = new Set(members[1]);
+      let AB = new Set([...members[0]].filter(x => B.has(x)));
+      var sets = [ {sets: [colnames[0]], size: A.size-AB.size},
+         {sets: [colnames[1]], size: B.size-AB.size},
+         {sets: [colnames[0], colnames[1]], size: AB.size}];
       var chart = VennDiagram()
         .width(700)
         .height(700);
@@ -236,32 +305,32 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       this._ngZone.runOutsideAngular(() => {
 
       D3.selectAll("svg").remove();
-      var A = new Set(this.members[0]);
-      var B = new Set(this.members[1]);
-      var C = new Set(this.members[2]);
-      let A_B_C = new Set([...this.members[0]]
+      var A = new Set(members[0]);
+      var B = new Set(members[1]);
+      var C = new Set(members[2]);
+      let A_B_C = new Set([...members[0]]
         .filter(x=> B.has(x))
         .filter(y => C.has(y)))
-      let A_B = new Set([...this.members[0]]
+      let A_B = new Set([...members[0]]
         .filter(x => B.has(x)));
       //  .filter(y => A_B_C.has(y)));
-      let A_C = new Set([...this.members[0]]
+      let A_C = new Set([...members[0]]
         .filter( x=> C.has(x))
         .filter( y => !A_B_C.has(y)));
-      let B_C = new Set([...this.members[1]]
+      let B_C = new Set([...members[1]]
         .filter( x=> C.has(x))
         .filter( y => !A_B_C.has(y)));
       let NOTASIZE = A_B.size + A_C.size - A_B_C.size;
       let NOTBSIZE = A_B.size + B_C.size - A_B_C.size;
       let NOTCSIZE = A_C.size + B_C.size - A_B_C.size;
 
-      var sets = [ {sets: [this.colnames[0]], size: A.size},
-       {sets: [this.colnames[1]], size: B.size},
-       {sets: [this.colnames[2]], size: C.size},
-       {sets: [this.colnames[0], this.colnames[1]], size: A_B.size},
-       {sets: [this.colnames[1], this.colnames[2]], size: B_C.size},
-       {sets: [this.colnames[0], this.colnames[2]], size: A_C.size},
-       {sets: [this.colnames[0], this.colnames[1], this.colnames[2]], size: A_B_C.size}
+      var sets = [ {sets: [colnames[0]], size: A.size},
+       {sets: [colnames[1]], size: B.size},
+       {sets: [colnames[2]], size: C.size},
+       {sets: [colnames[0], colnames[1]], size: A_B.size},
+       {sets: [colnames[1], colnames[2]], size: B_C.size},
+       {sets: [colnames[0], colnames[2]], size: A_C.size},
+       {sets: [colnames[0], colnames[1], colnames[2]], size: A_B_C.size}
       ].map(function(set) {
         set.size = Math.sqrt(set.size);
         return set;
@@ -278,7 +347,6 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       this.memberList = null;
       //console.log(this.matrix);
       //TO DO: USE A PROMISE TO GET RESULTS, to avoid error.
-      this.calc.ca(this.matrix, Array.from(this.rownames), Array.from(this.colnames));
 
       var row_coords = this.calc.row_coords;
       var col_coords = this.calc.col_coords;
@@ -289,7 +357,7 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       });
 
       this.col_coordinates = col_coords.map((x, i) => {
-        return [x[0], x[1], this.colnames[i]];
+        return [x[0], x[1], this.calc.colnames[i]];
       });
 
       this.dimensions = dimensions.map(x => {
