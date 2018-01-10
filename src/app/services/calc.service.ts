@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as num from 'numericjs';
+import * as jStat from 'jstat';
 import {Observable} from 'rxjs/Rx';
+import * as chi from 'chi-squared-test';
 
 @Injectable()
 export class CalcService {
@@ -16,14 +18,24 @@ export class CalcService {
   col_coords: number[]=[];
   /** updated rownames (after REMOVESINGLES)**/
   matrix: number [][];
+  normalized: number [][];
   rownames: string[];
   colnames: string[];
+  // filtered to remove singles.
+  filt_rownames: string[];
+  filt_matrix: number[][];
   /** eigenvalues for calculating dimensions **/
   dimensions: number[]=[];
+  /** expected values matrix for Pearson chi-square test **/
+  observed: number[][];
+  expected: number [][];
+  residualSS: number [][];
+  chisquaredVal: number;
   /** whether to remove items with only one link **/
   REMOVESINGLES: boolean = true;
 
   constructor() {
+    this.REMOVESINGLES = true;
   }
   /** Conduct a correspondence analysis of matrix
   with rownames and column names **/
@@ -42,15 +54,15 @@ export class CalcService {
       this.colnames = Array.from(sub).map(x => x)
     )
     if (this.REMOVESINGLES) {
-      this.rownames = this.rownames
-          .filter((y, i) =>{
+      this.rownames = this.rownames.filter((x, i) =>{
         if (this.matrix[i].reduce((a,b) => a + b, 0) > 1) {
-        return y;
+        return x;
       }
-    });
-      this.matrix.filter(x =>
+      })
+      this.matrix = this.matrix.filter(x =>
         {return x.reduce((a, b) => a + b, 0) > 1});
     }
+
     if (this.matrix.length < this.matrix[0].length) {
       this.matrix = num.transpose(this.matrix);
     }
@@ -66,8 +78,14 @@ export class CalcService {
     })
     let R = num.sub(P,E);
     let I = num.div(R,E);
+    let Res = num.sub(this.matrix, E)
+    this.residualSS = num.div(num.exp(Res, 2), E);
+    this.chisquaredVal = num.sum(this.residualSS);
     let Z = num.mul(I, num.sqrt(E));
+    let EXP = num.div(E, num.sum(this.matrix));
     let SVD = num.svd(Z);
+    this.observed = Z;
+    this.expected = EXP;
     this.svd = SVD;
     this.cvg = true;
     this.row_coords = SVD['U'].map( x=> {
@@ -78,5 +96,10 @@ export class CalcService {
       });
     this.dimensions = num.div(SVD['S'], num.sum(SVD['S']));
       return response;
+  }
+
+  chisquared() {
+    var dof = ((this.matrix.length-1) * (this.matrix[0].length-1));
+    return {chiSquared: this.chisquaredVal, probability: jStat.jStat.chisquare.pdf(this.chisquaredVal, dof), dof: dof};
   }
 }

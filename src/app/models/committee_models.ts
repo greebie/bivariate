@@ -4,12 +4,14 @@ export interface MemberInterface {
   middleName?: string,
   party?: string,
   elected?: Date,
-  finished?: Date | "present",
+  finished?: Date | Present | string,
   profession?: string,
-  riding?: string
+  riding?: string,
+  weight?: number,
 }
 
 export interface CommitteeInterface {
+    key: string,
     session: string,
     date: Date,
     enddate: Date | Present,
@@ -20,12 +22,15 @@ export interface CommitteeInterface {
     jurisdiction?: string,
     description?: string,
     notes?: string,
-    membership: Member[]
+    membership: Member[],
+    tags?: string[],
+    weight?: number
   }
 
-  export class Present implements Present {
+  export class Present {
     display = "present";
-    getDate = new Date();
+    date = new Date();
+    getDate = this.date.getFullYear() + "-" + (this.date.getMonth()<10?'0':'') + (this.date.getMonth() + 1) + "-" + (this.date.getDate()<10?'0':'') + this.date.getDate();
     }
 
 export class Member implements MemberInterface {
@@ -34,19 +39,21 @@ export class Member implements MemberInterface {
     middleName: string;
     party: string;
     elected: Date;
-    finished: Date | "present";
+    finished: Date | Present | string;
     profession: string;
     riding: string;
     displayName: string;
+    weight: number;
     constructor (
       firstName: string,
       lastName: string,
       middleName?: string,
       party?: string,
       elected?: Date,
-      finished?: Date | "present",
+      finished?: Date | Present | "present",
       profession?: string,
       riding?: string,
+      weight?: number,
     ) {
       this.firstName = firstName;
       this.lastName = lastName;
@@ -54,14 +61,16 @@ export class Member implements MemberInterface {
       this.party = party;
       this.elected = elected;
       if (finished == null) {
-        this.finished = "present";
+        this.finished = new Present().display;
       }
       else {
         this.finished = <Date>finished;
       }
       this.profession = profession;
       this.riding = riding;
-      this.displayName = lastName + ", " + firstName[0] + middleName[0]
+      let middle = middleName ? middleName[0] : "";
+      this.displayName = lastName + ", " + firstName[0] + middle;
+      this.weight = weight ? weight : 0;
     }
   }
 
@@ -77,9 +86,12 @@ export class Committee implements CommitteeInterface {
   jurisdiction: string;
   description: string;
   notes: string;
+  tags: string[];
+  key: string;
 
 
   constructor (
+    key: string,
     session: string,
     date: Date,
     enddate: Date | Present,
@@ -90,8 +102,10 @@ export class Committee implements CommitteeInterface {
     country?: string,
     jurisdiction?: string,
     description?: string,
-    notes?: string
+    notes?: string,
+    tags?:string[]
   ) {
+    this.key = key;
     this.session = session;
     this.date = date;
     this.enddate = enddate;
@@ -103,5 +117,6 @@ export class Committee implements CommitteeInterface {
     this.description = description;
     this.membership = membership;
     this.notes = notes;
+    this.tags = tags;
   }
 }

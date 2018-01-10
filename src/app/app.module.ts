@@ -27,8 +27,12 @@ import { IntroComponent } from './intro/intro.component';
 import { AddCommitteeComponent } from './add-committee/add-committee.component';
 import { VisualiseComponent } from './visualise/visualise.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { ExplanationComponent } from './explanation/explanation.component';
 
+//Material
 
+//bootstrap
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 // Angular Fire (Database etc.)
 import { AngularFireModule } from 'angularfire2';
@@ -42,6 +46,7 @@ const appRoutes: Routes = [
   { path: 'intro', component: IntroComponent},
   { path: 'add', component: AddCommitteeComponent },
   { path: 'visualise', component: VisualiseComponent },
+  { path: 'about', component: ExplanationComponent},
   { path: '**', component: PageNotFoundComponent }
 ];
 
@@ -51,12 +56,14 @@ const appRoutes: Routes = [
     AddCommitteeComponent,
     VisualiseComponent,
     PageNotFoundComponent,
-    IntroComponent
+    IntroComponent,
+    ExplanationComponent
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(appRoutes),
-    StoreModule.provideStore({committees: committeesReducer} ),
+    NgbModule.forRoot(),
+    StoreModule.forRoot({committees: committeesReducer} ),
     CollapseModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,

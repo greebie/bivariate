@@ -49,6 +49,7 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
   // Groups selected from sets & psets
   @Input() session: Set<string> = new Set();
   @Input() psession: Set<string> = new Set();
+  @Input() groups: Set<string> = new Set();
   // Committees available to the the graph
   // (After groups are selected)
   state;
@@ -56,8 +57,8 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
   members: Observable<Set<Member>>;
   // Total number of committees (columns)
   // and members (rows)
-  totalCols: number;
-  totalRows: number;
+  totalCols: Observable<number>;
+  totalRows: Observable<number>;
   // Data from the form produced by sets
   groupForm: FormGroup;
 
@@ -72,6 +73,16 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
   row_coordinates;
   row_coords;
   col_coords;
+
+  // additional statistics
+
+  chisquared: any = {chiSquared: 0, probability: 1, dof: 1};
+
+  // highlighting
+  selectedRows: number[] = []
+  singlesREMOVE: boolean;
+  useWeights: boolean = false;
+
 
   constructor(public auth: AngularFireAuth,
     public db: AngularFireDatabase,
@@ -126,6 +137,10 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
         .attr("height", h);
   }
 
+  selectedRow(index) {
+    return this.selectedRows.indexOf(index) != -1
+  }
+
   ngOnChanges(changes) {
 
   }
@@ -142,6 +157,8 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
   addGroup() {
     if (this.groupForm.value.session) this.session.add (this.groupForm.value.session);
     if (this.groupForm.value.psession) this.psession.add (this.groupForm.value.psession);
+    this.session.forEach(x => {this.groups.add(x)});
+    this.psession.forEach(x => {this.groups.add(x)});
     var committees = [];
     var pcommittees = [];
     this.private.subscribe( x => {
@@ -158,15 +175,18 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
           });
     }
 
-  addCommitteeToGraph(committee:Committee) {
-    // probably get rid of this.
-    /*committee.membership.forEach(x =>
-      this.rownames.add(x.displayName)
-    );
-    this.colnames.add(committee.abbreviation)
-    this.totalCols = this.colnames.count()
-    this.totalRows = this.rownames.count() */
-    // until here.
+  removeGroup(group) {
+    this.groups.delete(group);
+    this.psession.delete(group);
+    this.session.delete(group);
+    this.committees = this.committees.map( y =>
+      y.filter( x =>
+        x.session !== group
+    ));
+  }
+
+  addCommitteeToGraph(committee:Committee, index:number) {
+
     try {
       var eventExists = this._hs.checkCommitteeInState(committee);
     }
@@ -175,9 +195,11 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
     }
   if (eventExists == false) {
     this._hs.addCommittee(committee);
+    this.selectedRows.push(index);
     }
     else {
       this._hs.removeCommittee(committee);
+      this.selectedRows = this.selectedRows.filter(x => x !== index);
     }
     this.state = this._hs.getCommitteeState();
     this.state.subscribe(x => {
@@ -192,6 +214,8 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
       this.rownames = Observable.of(setnames);
     }
   );
+  this.totalCols = this.colnames.count();
+  this.totalRows = this.rownames.count();
   this.createMatrix();
   this.show_graph();
   }
@@ -211,15 +235,21 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
         var z = [];
         this.state.subscribe(sub => sub
           .map(col => {
-            var present = col.membership.map( member => member.displayName)
-              .filter(y => y.indexOf(x) > -1);
-            var isPresent = present.length == 0 ? 0 : 1;
-            z.push(isPresent);
+            var present = col.membership.map( member => {return [member.displayName, member.weight]})
+              .filter(y => y[0].indexOf(x) > -1);
+            if (this.useWeights) {
+              var weight = present.length == 0 ? 0: present[0][1];
+              z = col.membership.map(member => member.weight);
+            } else {
+              var isPresent = present.length == 0 ? 0 : 1;
+              z.push(isPresent);
+            }
+
           }));
       matrix.push(z);})
     );
     this.matrix = Observable.of([...matrix]);
-    this.calc.REMOVESINGLES = false;
+    this.calc.REMOVESINGLES = this.singlesREMOVE;
     this.calc.ca(this.matrix, this.rownames, this.colnames);
   }
 
@@ -234,6 +264,7 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
 
   show_graph() {
     this.initGraph();
+
     var members = [];
     var colnames = [];
     this.colnames.subscribe(sub =>
@@ -252,7 +283,10 @@ export class VisualiseComponent implements OnInit, AfterViewInit {
     } else {
       this.createMatrix();
     }
+
+    console.log(this.chisquared);
     var s: number = this.calc.matrix != undefined ? this.calc.matrix[0].length : 0;
+    this.chisquared = s >=0 ? this.calc.chisquared(): null;
     switch(s) {
       case 0:
         D3.selectAll("svg").remove();

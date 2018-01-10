@@ -21,10 +21,19 @@
     </div>
       <button class="btn btn-primary" type="submit">AddGroup</button>
   </form>
+  <div>
+    <ul *ngFor="let group of groups">
+      <li>{{group}}<button type="button" class="btn btn-light" (click)="removeGroup(group)"><span>x</span></button>
+      </ul>
+    </div>
 </div>
 <div class="col-sm-2">
-  <div>Total Committees: {{totalCols}}</div>
-  <div>Total Members: {{totalRows}}</div>
+  <!--<label for="toggleSingles">Filter out single rows</label>
+  <input id="toggleSingles" (change)="singlesREMOVE = !singlesREMOVE" value="angular" type="checkbox"/>-->
+  <div>Total Committees: {{totalCols | async}}</div>
+  <div>Total Members: {{totalRows | async}}</div>
+  <div>Chi-squared: {{chisquared.chiSquared}}</div>
+  <div>Probability: {{chisquared.probability}}</div>
   <!-->  Use to test Observable outputs
   <ul *ngFor="let col of colnames | async"> <li> {{col}}</ul> -->
 </div>
@@ -32,9 +41,9 @@
   <div class="row">
     <div class="col-sm-3">
     <table class="table-sm table-hover table-bordered table-info table-striped rounded">
-      <tr *ngFor="let committee of committees | async" class="spacer">
-        <th id="{{committee.abbreviation}}_{{committee.session}}" (click)="addCommitteeToGraph(committee)" class="table-primary"> {{committee.abbreviation}}
-        <td id="{{committee.abbreviation}}_{{committee.session}}" (click)="addCommitteeToGraph(committee)" class="pt-6" > <i>{{committee.name}}</i>
+      <tr *ngFor="let committee of committees | async; let i=index" [class.bg-warning]="selectedRow(i)" class="spacer">
+        <th id="{{committee.abbreviation}}_{{committee.session}}" (click)="addCommitteeToGraph(committee, i)" class="table-primary">{{committee.abbreviation}}
+        <td id="{{committee.abbreviation}}_{{committee.session}}" (click)="addCommitteeToGraph(committee, i)" class="pt-6" > <i>{{committee.name}}</i>
         </tr>
     </table>
   </div>

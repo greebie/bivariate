@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-sm-8">
+    <h1> Explanation / FAQ </h1>
+  <div class="card card-default bg-light p-3">
+<div class="card-heading"></div>
+
+<div class="card-body"><p>
+
+<h3> What Does it Do? </h3>
+
+<p> Although still in development, this project will let you <a href="/add">
+  store
+  a selection of "committees" </a> to your account and then you can use
+  these committees to produce a <a href="/visualise">visualisation</a> that will compare those
+  committees based on common membership.
+</p>
+
+<p> If you are logged in, you can select your own committees, but if you just
+    want to play, you can use my small selection of test data. At this stage
+    I am looking to improve the user interface, but you can simply select a "group"
+    (category of committees) which will add some committees to the screen.
+    When you click on each of these committees, it will add them to the visualisation
+    graph.
+</p>
+<p> After one click, not much will happen, but after two, you should see a Venn
+      Diagram representing the two committees and the number of "members" they
+      have in common.  A similar graph will show for three committees.
+</p>
+
+<p> After four clicks, assuming that there are sufficient members to
+    produce one, a correspondence graph will be created to show the interrelation
+    of the committees based on their memberships, using the top two dimensions
+    from a correspondence analysis. While a detailed description of
+  correspondence analysis is not possible here, you can learn more by reading my
+<a href="https://programminghistorian.org/lessons/correspondence-analysis-in-R">
+  tutorial at the Programming Historian</a> or the articles in the Bibliography
+below.</p>
+
+<h3> What is it For? </h3>
+
+<p> While the main reason I have developed this was "because I can," I do have a few
+  ideas about what it could be used for.</p>
+
+<p>  This demo builds on a tutorial I provide at <a
+  href="https://programminghistorian.org/lessons/correspondence-analysis-in-R">
+  Programming Historian</a>, and has been inspired by a number of scholars
+  whose writing has helped learn both the power and potential of bivariate
+  network analysis in social science research. These include:</p>
+  <ul>
+    <li> <a href="http://www.socsci.uci.edu/~kfaust/faust/research/research.htm"> Dr. Katherine Faust</a></li>
+    <li> <a href=""></a></li>
+    </ul>
+<p> For one, it could help students learn more about correspondence analysis
+and what it does. While the current literature is full of Greek letters and useful
+examples, this project can show correspondence analysis in real time.  Rather
+than reading about bivariate networks in detail, they can simply create them
+on the fly, using their own data and gain a better understanding of what the
+analysis is actually about.</p>
+<p> While bivariate analysis tends to be exploratory, the advantage of this tool
+  is that is enables the adding and removing of committees on the fly.  This can
+  be important when one committee is so different that it confounds the plot and makes
+  it hard to see what is happening.  Of course, this is a bad way to approach towards
+hypothesis testing, but as an exploratory tool it can help narrow the scope of an
+analysis, making stronger research questions.</p>
+<p> Finally, i discovered while working with very large Web Archives (500GB or bigger),
+  more attention is needed for exploratory data analysis, for both its strengths
+  and for its weaknesses.  While much Big Data analysis is focussed on predictions
+  based on correlations, less work has been done on how to explore a system to
+  <i>understand</i> it. This path has great potential, but also a large number of
+  pitfalls. In order to take advantage of the potential and minimize the effect
+  of the pitfalls, we need strong tools.  This particular tool may not be the answer,
+  to this more general problem but hopefully
+  it can contribute to a larger body of work.</p>
+
+  <h3> What is Your Policy on Privacy? </h3>
+<p>  This project is a demonstration for personal use only and I offer no warrantees on the security
+  or privacy of the data you produce here.  If you have sensitive data that you want
+  to protect, I would not use this service.  However, you can <a href="/contact">Contact Me</a> 
+  if you are interested in using my set up on top of a database you control yourself.  You are also
+welcome to use <a href="https://github.com/greebie/bivariate"> the source code as licensed.</a></p>
+<p> This project uses <a href="http://firebase.google.com"> Firebase </a> to do the heavy
+  database work.  The positive is that it is fast.  It is also (mostly) private. But Google
+  will use it to improve their algorithms, so if that offends you, do not login.</p>
+  <p> If you added something and want it exploded, just contact me and I will try to explode
+    it in a timely manner.  However, I cannot make any great promises on this route.</p>
+</div>
+</div>
+</div>
