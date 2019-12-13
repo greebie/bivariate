@@ -40,7 +40,7 @@
     "jstat": "^1.7.1",
     "ng-bootstrap": "^1.6.3",
     "ngx-bootstrap": "^2.0.0-rc.0",
-    "npm": "^5.6.0",
+    "npm": "^6.13.4",
     "numbers": "^0.6.0",
     "numericjs": "^1.2.6",
     "rxjs": "^5.5.6",
